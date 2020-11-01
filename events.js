@@ -23,7 +23,7 @@ class Events {
   }
 
   onMouseDown(evt) {
-    if (this.plot.mode === 'knn') {
+    if (this.plot.mode === 'add') {
       const newInstance = this.getMouseCoords(evt);
       const trainingData = this.dataset.getTrainingData();
       const k = this.k.value;
@@ -34,28 +34,26 @@ class Events {
         this.main.getClassificationMethod()
       ).d;
       trainingData.push(newInstanceClassified);
-      this.dataset.updateTrainingData(trainingData, k, false);
+      this.dataset.updateTrainingData(trainingData, k, true);
     }
   }
 
   onMouseMove(evt) {
-    if (this.plot.mode === 'knn') {
-      // check for too many updates, may be too heavy to execute on all move events
-      const now = Date.now();
-      if (this.nextUpdate > now) {
-        if (this.timeout) clearTimeout(this.timeout);
-        // Timeout helps if mouse stops moving and position is not centered
-        this.timeout = setTimeout(() => {
-          const newInstance = this.getMouseCoords(evt);
-          this.main.updateKNN(this.dataset.getTrainingData(), newInstance, this.k.value);
-          document.getElementById('mouse-position').innerHTML = `X: ${newInstance.x.toFixed(
-            4
-          )} | Y: ${newInstance.y.toFixed(4)}`;
-        }, this.nextUpdate - now);
-        return;
-      }
-      this.nextUpdate = now + 1000 / fps;
+    // check for too many updates, may be too heavy to execute on all move events
+    const now = Date.now();
+    if (this.nextUpdate > now) {
+      if (this.timeout) clearTimeout(this.timeout);
+      // Timeout helps if mouse stops moving and position is not centered
+      this.timeout = setTimeout(() => {
+        const newInstance = this.getMouseCoords(evt);
+        this.main.updateKNN(this.dataset.getTrainingData(), newInstance, this.k.value);
+        document.getElementById('mouse-position').innerHTML = `X: ${newInstance.x.toFixed(
+          4
+        )} | Y: ${newInstance.y.toFixed(4)}`;
+      }, this.nextUpdate - now);
+      return;
     }
+    this.nextUpdate = now + 1000 / fps;
   }
 
   // Convert from mouse position to coordinates position

@@ -1,21 +1,31 @@
 const chartId = 'chart';
 const plotlyOptions = {
+  doubleClick: false,
+  showAxisDragHandles: false,
   scrollZoom: false,
   locale: 'es',
   displaylogo: false,
   responsive: true,
+  displayModeBar: true,
   modeBarButtons: [
     [
       {
-        name: 'K vecinos próximos',
-        active: 'true',
-        icon: Plotly.Icons.tooltip_compare,
-        click: () => main.plot.setMode('knn'),
+        name: 'Agregar instancias',
+        icon: Plotly.Icons.pencil,
+        click: () => main.plot.setMode('add'),
+        val: 'add'
       },
       {
-        name: 'Modo Panorámica',
-        icon: Plotly.Icons.pan,
-        click: () => main.plot.setMode('pan'),
+        name: 'Comparar KNN',
+        // NOT SUPPORTED :(
+        // active: true,
+        icon: {
+          width: 576,
+          height: 512,
+          path: "M 288 144 a 110.94 110.94 0 0 0 -31.24 5 a 55.4 55.4 0 0 1 7.24 27 a 56 56 0 0 1 -56 56 a 55.4 55.4 0 0 1 -27 -7.24 A 111.71 111.71 0 1 0 288 144 Z m 284.52 97.4 C 518.29 135.59 410.93 64 288 64 S 57.68 135.64 3.48 241.41 a 32.35 32.35 0 0 0 0 29.19 C 57.71 376.41 165.07 448 288 448 s 230.32 -71.64 284.52 -177.41 a 32.35 32.35 0 0 0 0 -29.19 Z M 288 400 c -98.65 0 -189.09 -55 -237.93 -144 C 98.91 167 189.34 112 288 112 s 189.09 55 237.93 144 C 477.1 345 386.66 400 288 400 Z"
+        },
+        click: () => main.plot.setMode('view'),
+        val: 'view'
       },
       // 'pan2d',
       // 'zoomIn2d',
@@ -47,12 +57,14 @@ class Plot {
         range: [-15, 15],
         showgrid: false,
         zeroline: false,
+        fixedrange: true
       },
       yaxis: {
         nticks: 23,
         range: [-15, 15],
         showgrid: false,
         zeroline: false,
+        fixedrange: true
       },
       legend: {
         orientation: 'h',
@@ -67,7 +79,7 @@ class Plot {
       },
     };
     Plotly.newPlot(chart, [], this.layout, plotlyOptions);
-    this.setMode('knn');
+    this.setMode('view');
   }
 
   updateLayout(data) {
@@ -90,9 +102,7 @@ class Plot {
   }
 
   updatePlot(P, d, k) {
-    if (this.mode === 'knn')
-      Plotly.react(this.chart, this.formatNewInstanceToPlot(P, d, k), this.layout, plotlyOptions);
-    else Plotly.react(this.chart, this.plotedTrainingData, this.layout, plotlyOptions);
+    Plotly.react(this.chart, this.formatNewInstanceToPlot(P, d, k), this.layout, plotlyOptions);
   }
 
   updateTrainingDataToPlot(trainingData) {
@@ -144,15 +154,6 @@ class Plot {
 
   setMode(mode) {
     this.mode = mode;
-    if (mode === 'knn') {
-      document.getElementsByClassName('draglayer')[0].style.cursor = 'none';
-    }
-    if (mode === 'pan') {
-      document.getElementsByClassName('draglayer')[0].style.cursor = 'move';
-      document.getElementById('mouse-position').innerHTML = '';
-      this.updatePlot();
-      this.knnTable.updateTable([]);
-    }
   }
 
   toggleAxisGrid() {

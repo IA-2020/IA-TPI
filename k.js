@@ -14,8 +14,7 @@ class K {
   update(k) {
     this.input.value = k;
     this.slider.value = k;
-    if (this.plot.mode === 'knn') this.main.updateKNN(this.dataset.getTrainingData(), { x: 0, y: 0 }, k);
-    else this.plot.updatePlot();
+    this.main.updateKNN(this.dataset.getTrainingData(), { x: 0, y: 0 }, k);
     this.canvas.updateCanvas(this.dataset.getTrainingData(), k);
   }
 
